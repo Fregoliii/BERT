@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from transformers import BertTokenizer, BertForSequenceClassification, AdamW
 from datasets import load_dataset
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
@@ -22,9 +22,19 @@ def tokenize_function(examples):
 tokenized_train = dataset['train'].map(tokenize_function, batched=True)
 tokenized_test = dataset['test'].map(tokenize_function, batched=True)
 
+# Use only half of the dataset
+train_size = len(tokenized_train) // 2
+test_size = len(tokenized_test) // 2
+
+train_indices = list(range(train_size))
+test_indices = list(range(test_size))
+
+tokenized_train = Subset(tokenized_train, train_indices)
+tokenized_test = Subset(tokenized_test, test_indices)
+
 # Set the format of the datasets to PyTorch tensors
-tokenized_train.set_format('torch', columns=['input_ids', 'attention_mask', 'label'])
-tokenized_test.set_format('torch', columns=['input_ids', 'attention_mask', 'label'])
+tokenized_train.dataset.set_format('torch', columns=['input_ids', 'attention_mask', 'label'])
+tokenized_test.dataset.set_format('torch', columns=['input_ids', 'attention_mask', 'label'])
 
 # Set up data loaders
 train_dataloader = DataLoader(tokenized_train, shuffle=True, batch_size=16)
