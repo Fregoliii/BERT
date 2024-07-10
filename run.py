@@ -8,11 +8,11 @@ import seaborn as sns
 import numpy as np
 
 # Load AG News dataset
-dataset = load_dataset("ag_news")
+dataset = load_dataset("imdb")
 
 # Initialize tokenizer and model
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=4)
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
 # Tokenize function
 def tokenize_function(examples):
@@ -24,7 +24,7 @@ tokenized_test = dataset['test'].map(tokenize_function, batched=True)
 
 # Use only half of the dataset
 train_size = len(tokenized_train) // 2
-test_size = len(tokenized_test) // 2
+test_size = len(tokenized_test)
 
 train_indices = list(range(train_size))
 test_indices = list(range(test_size))
